@@ -23,13 +23,11 @@ app.get('/', (req, res) => {
 });
 
 // POST Route for Contact Form
-app.post('/api/contact', (req, res) => {
+app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
 
-    console.log('Received submission:', { name, email, message });
 
-    // Respond immediately to the client to prevent lag
-    res.status(200).json({ success: true, message: 'Message received! Sending email in background.' });
+    console.log('Received submission:', { name, email, message });
 
     // 1. Setup Email Transporter (Created per request to avoid connection timeouts)
     const transporter = nodemailer.createTransport({
@@ -56,10 +54,15 @@ ${message}
         replyTo: email
     };
 
-    // 3. Send Email (Background)
-    transporter.sendMail(mailOptions)
-        .then(() => console.log('Email sent successfully'))
-        .catch(error => console.error('Error sending email:', error));
+    // 3. Send Email
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully');
+        res.status(200).json({ success: true, message: 'Email sent successfully!' });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ success: false, message: 'Failed to send email' });
+    }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
