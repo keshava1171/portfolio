@@ -10,8 +10,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins (for debugging)
+    methods: ['POST', 'GET'],
+    credentials: true
+}));
 app.use(bodyParser.json());
+
+// Health Check Route (for Render to know we are alive)
+app.get('/', (req, res) => {
+    res.send('Backend is running!');
+});
 
 // POST Route for Contact Form
 app.post('/api/contact', async (req, res) => {
@@ -57,6 +66,6 @@ ${message}
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
