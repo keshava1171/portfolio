@@ -32,6 +32,12 @@ const Contact = () => {
             return;
         }
 
+        console.log("Using EmailJS Keys:", {
+            serviceId: serviceId,
+            templateId: templateId,
+            publicKey: publicKey
+        });
+
         try {
             const response = await emailjs.send(
                 serviceId,
@@ -47,6 +53,7 @@ const Contact = () => {
 
         } catch (error) {
             console.error("FAILED...", error);
+            if (error.text) console.error("Error Text:", error.text);
             setStatus('error');
         }
     };
