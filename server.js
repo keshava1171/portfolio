@@ -17,25 +17,6 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
-// Global Transporter (Reusable)
-// Reverting to 'service: gmail' as explicit host/port was timing out on Render
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
-
-// Verify connection configuration on startup
-transporter.verify(function (error, success) {
-    if (error) {
-        console.log('Transporter connection error:', error);
-    } else {
-        console.log('Server is ready to take our messages');
-    }
-});
-
 // Health Check Route (for Render to know we are alive)
 app.get('/', (req, res) => {
     res.send('Backend is running!');
@@ -47,10 +28,19 @@ app.post('/api/contact', (req, res) => {
 
     console.log('Received submission:', { name, email, message });
 
-    // Respond immediately to the client
+    // Respond immediately to the client to prevent lag
     res.status(200).json({ success: true, message: 'Message received! Sending email in background.' });
 
-    // Configure Email
+    // 1. Setup Email Transporter (Created per request to avoid connection timeouts)
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    // 2. Configure Email
     const mailOptions = {
         from: email,
         to: process.env.EMAIL_USER,
@@ -66,7 +56,7 @@ ${message}
         replyTo: email
     };
 
-    // Send Email (Background)
+    // 3. Send Email (Background)
     transporter.sendMail(mailOptions)
         .then(() => console.log('Email sent successfully'))
         .catch(error => console.error('Error sending email:', error));
