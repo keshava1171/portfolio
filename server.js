@@ -17,32 +17,33 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+// Global Transporter (Reusable)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
 // Health Check Route (for Render to know we are alive)
 app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
 
 // POST Route for Contact Form
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', (req, res) => {
     const { name, email, message } = req.body;
 
     console.log('Received submission:', { name, email, message });
 
-    // 1. Setup Email Transporter
-    // NOTE: You need to generate an App Password if using Gmail
-    // https://myaccount.google.com/apppasswords
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
+    // Respond immediately to the client
+    res.status(200).json({ success: true, message: 'Message received! Sending email in background.' });
 
-    // 2. Configure Email
+    // Configure Email
     const mailOptions = {
-        from: email, // This might be overridden by Gmail to be the authenticated user
-        to: process.env.EMAIL_USER, // Your email address where you want to receive messages
+        from: email,
+        to: process.env.EMAIL_USER,
         subject: `Portfolio Message from ${name}`,
         text: `You have received a new message from your portfolio website:
 
@@ -55,15 +56,10 @@ ${message}
         replyTo: email
     };
 
-    // 3. Send Email
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-        res.status(200).json({ success: true, message: 'Email sent successfully!' });
-    } catch (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ success: false, message: 'Failed to send email' });
-    }
+    // Send Email (Background)
+    transporter.sendMail(mailOptions)
+        .then(() => console.log('Email sent successfully'))
+        .catch(error => console.error('Error sending email:', error));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
