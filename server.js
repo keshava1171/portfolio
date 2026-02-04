@@ -18,17 +18,13 @@ app.use(cors({
 app.use(bodyParser.json());
 
 // Global Transporter (Reusable)
-// Using explicit settings for better reliability on Render
+// Reverting to 'service: gmail' as explicit host/port was timing out on Render
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // use SSL
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
-    logger: true,
-    debug: true, // include SMTP traffic in the logs
 });
 
 // Verify connection configuration on startup
