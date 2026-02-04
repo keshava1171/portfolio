@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLinkedin, FaGithub, FaPaperPlane } from 'react-icons/fa';
 
+import emailjs from '@emailjs/browser';
+
 const Contact = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -18,39 +20,33 @@ const Contact = () => {
         e.preventDefault();
         setStatus('submitting');
 
-        // Debug Log
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const formAction = `${API_URL}/api/contact`;
-        console.log("Attempting to send email to:", formAction);
+        const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-        // Cold Start message
-        const coldStartTimer = setTimeout(() => {
-            alert("This might take a minute! 🕒\n\nSince I'm using a free server, it goes to sleep when inactive. Please wait while it wakes up...");
-        }, 4000);
+        // Validation only for the existence of keys (optional, but helpful for debugging)
+        if (!serviceId || !templateId || !publicKey) {
+            console.error("EmailJS environment variables are missing!");
+            alert("EmailJS configuration is missing. Please check your .env file.");
+            setStatus('error');
+            return;
+        }
 
         try {
-            const response = await fetch(formAction, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+            const response = await emailjs.send(
+                serviceId,
+                templateId,
+                formData,
+                publicKey
+            );
 
-            clearTimeout(coldStartTimer); // Clear timer if it succeeds fast
+            console.log("SUCCESS!", response.status, response.text);
+            setStatus('success');
+            setFormData({ name: '', email: '', message: '' });
+            setTimeout(() => setStatus(null), 5000);
 
-            if (response.ok) {
-                setStatus('success');
-                setFormData({ name: '', email: '', message: '' });
-                setTimeout(() => setStatus(null), 5000);
-            } else {
-                console.error("Server responded with error:", response.status, response.statusText);
-                setStatus('error');
-            }
         } catch (error) {
-            clearTimeout(coldStartTimer);
-            console.error("Fetch error:", error);
+            console.error("FAILED...", error);
             setStatus('error');
         }
     };
