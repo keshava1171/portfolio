@@ -18,12 +18,24 @@ app.use(cors({
 app.use(bodyParser.json());
 
 // Global Transporter (Reusable)
+// Using explicit settings for better reliability on Render
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+});
+
+// Verify connection configuration on startup
+transporter.verify(function (error, success) {
+    if (error) {
+        console.log('Transporter connection error:', error);
+    } else {
+        console.log('Server is ready to take our messages');
+    }
 });
 
 // Health Check Route (for Render to know we are alive)
