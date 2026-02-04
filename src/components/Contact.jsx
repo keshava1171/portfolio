@@ -18,9 +18,15 @@ const Contact = () => {
         e.preventDefault();
         setStatus('submitting');
 
-        // Backend URL (uses environment variable in production, fallback to localhost)
+        // Debug Log
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const formAction = `${API_URL}/api/contact`;
+        console.log("Attempting to send email to:", formAction);
+
+        // Cold Start message
+        const coldStartTimer = setTimeout(() => {
+            alert("This might take a minute! 🕒\n\nSince I'm using a free server, it goes to sleep when inactive. Please wait while it wakes up...");
+        }, 4000);
 
         try {
             const response = await fetch(formAction, {
@@ -32,14 +38,19 @@ const Contact = () => {
                 body: JSON.stringify(formData)
             });
 
+            clearTimeout(coldStartTimer); // Clear timer if it succeeds fast
+
             if (response.ok) {
                 setStatus('success');
                 setFormData({ name: '', email: '', message: '' });
-                setTimeout(() => setStatus(null), 5000); // Clear success message after 5 seconds
+                setTimeout(() => setStatus(null), 5000);
             } else {
+                console.error("Server responded with error:", response.status, response.statusText);
                 setStatus('error');
             }
         } catch (error) {
+            clearTimeout(coldStartTimer);
+            console.error("Fetch error:", error);
             setStatus('error');
         }
     };
