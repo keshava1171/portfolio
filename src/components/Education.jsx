@@ -21,7 +21,7 @@ const educationData = [
         name: 'Sri Siddartha Junior College',
         degree: 'Intermediate',
         institution: '@ Andhra Pradesh, India',
-        duration: 'July 2021 - April 2023',
+        duration: 'July 2020 - April 2023',
         score: 'Percentage : 78.9%',
         points: [
             'Completed intermediate education with a focus on sciences.',
