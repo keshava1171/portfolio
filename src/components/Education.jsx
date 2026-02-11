@@ -36,7 +36,7 @@ const educationData = [
         degree: 'Matriculation',
         institution: '@ Andhra Pradesh, India',
         duration: 'June 2018 - July 2020',
-        score: 'CGPA : 90.60',
+        score: 'Percentage : 90.60%',
         points: [
             'Completed matriculation with distinction.',
             'Active participant in school events and science fairs.',
