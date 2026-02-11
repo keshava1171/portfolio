@@ -8,7 +8,7 @@ const certifications = [
         id: 1,
         title: 'NPTEL (IIT/IISc)',
         file: '/NPTEL.pdf',
-        description: 'Elite certification in Joy of Computing using Python.',
+        description: 'Elite certification in Cloud Computing.',
     },
     {
         id: 2,
