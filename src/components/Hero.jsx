@@ -69,7 +69,7 @@ const Hero = () => {
                                 Contact Me
                             </Link>
                             <a
-                                href="/MY_CV_UPDATED.pdf" target="_blank" rel="noopener noreferrer"
+                                href="/My_Final _CV_UMS.pdf" target="_blank" rel="noopener noreferrer"
                                 className="px-8 py-4 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-bold text-lg shadow-md hover:shadow-xl hover:border-secondary-500 hover:-translate-y-1 transition-all transform"
                             >
                                 Download Resume
